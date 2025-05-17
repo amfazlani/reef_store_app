@@ -4,10 +4,6 @@ class StoresController < ApplicationController
   def index
     @stores = Store.all
 
-    puts "*******************"
-    puts @stores.count
-    puts "*******************"
-
     render json: { data: @stores, status: 200 }
   end
 
