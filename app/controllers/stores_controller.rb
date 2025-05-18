@@ -2,7 +2,7 @@ class StoresController < ApplicationController
   before_action :find_store, only: [:show, :update, :destroy]
 
   def index
-    @stores = Store.all
+    @stores = Store.all.order(:name)
 
     render json: { data: @stores, status: 200 }
   end
@@ -18,10 +18,8 @@ class StoresController < ApplicationController
   end
 
   def update
-    @store = Store.new(store_params)
-
-    if @store.update(store_parameters)
-    render json: { data: @store, status: 200 }
+    if @store.update(store_params)
+      render json: { data: @store, status: 200 }
     else
       render json: { errors: @store.errors }, status: 422
     end
