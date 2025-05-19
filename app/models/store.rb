@@ -3,4 +3,6 @@ class Store < ApplicationRecord
 
   validates :name, presence: true
   validates :address, presence: true
+
+  scope :ordered, -> { order(:name) }
 end

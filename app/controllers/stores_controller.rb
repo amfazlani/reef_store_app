@@ -2,7 +2,7 @@ class StoresController < ApplicationController
   before_action :find_store, only: [:show, :update, :destroy]
 
   def index
-    @stores = Store.all
+    @stores = Store.all.ordered
 
     if params[:q].present?
       @stores = filter_stores
