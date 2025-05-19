@@ -1,5 +1,5 @@
 class IngredientsController < ApplicationController
-  before_action :find_item, except: [:destroy]
+  before_action :find_item, only: [:index, :create]
   before_action :find_ingredient, only: [:show, :update, :destroy]
 
   def index
@@ -9,7 +9,7 @@ class IngredientsController < ApplicationController
   end
 
   def create
-    @ingredient = Ingredient.new(ingredient_params)
+    @ingredient = Ingredient.new(ingredient_params.merge(item_id: @item.id))
 
     if @ingredient.save
       render json: { data: @ingredient, message: 'Ingredient created successfully', status: 200 }
@@ -41,7 +41,7 @@ class IngredientsController < ApplicationController
   private
 
   def ingredient_params
-    params.require(:ingredient).permit(:name, :quantity).merge(item_id: @item.id)
+    params.require(:ingredient).permit(:name, :quantity)
   end
 
   def find_ingredient

@@ -92,7 +92,7 @@ onMounted(async () => {
 
 
     // Fetch store items
-    const itemsRes = await fetch(`http://localhost:3000/items?store_id=${storeId}`);
+    const itemsRes = await fetch(`http://localhost:3000/stores/${storeId}/items`);
     if (!itemsRes.ok) throw new Error('Failed to load items');
     
    const itemData = await itemsRes.json()
@@ -107,7 +107,7 @@ onMounted(async () => {
 const createItem = async (newItem) => {
   try {
     const storeId = route.params.id;
-    const res = await fetch(`http://localhost:3000/items?store_id=${storeId}`, {
+    const res = await fetch(`http://localhost:3000/stores/${storeId}/items`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newItem)

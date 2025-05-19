@@ -1,5 +1,5 @@
 class ItemsController < ApplicationController
-  before_action :find_store
+  before_action :find_store, only: [:index, :create]
   before_action :find_item, only: [:show, :update, :destroy]
 
   def index
@@ -9,7 +9,7 @@ class ItemsController < ApplicationController
   end
 
   def create
-    @item = Item.new(item_params)
+    @item = Item.new(item_params.merge(store_id: @store.id))
 
     if @item.save
       render json: { data: @item, message: 'item created successfully', status: 200 }
@@ -41,7 +41,7 @@ class ItemsController < ApplicationController
   private
 
   def item_params
-    params.require(:item).permit(:name, :price, :description).merge(store_id: @store.id)
+    params.require(:item).permit(:name, :price, :description)
   end
 
   def find_item

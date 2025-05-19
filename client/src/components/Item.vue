@@ -181,16 +181,14 @@ const editingData = ref({ name: '', quantity: '' });
 
 onMounted(async () => {
   try {
-    const storeId = route.query.store_id;
-
     // Fetch item
-    const response = await fetch(`http://localhost:3000/items/${route.params.id}?store_id=${storeId}`);
+    const response = await fetch(`http://localhost:3000/items/${route.params.id}`);
     if (!response.ok) throw new Error('Failed to fetch item');
     const itemRes = await response.json();
     item.value = itemRes.data;
 
     // Fetch ingredients
-    const res = await fetch(`http://localhost:3000/ingredients?item_id=${route.params.id}`);
+    const res = await fetch(`http://localhost:3000/items/${route.params.id}/ingredients`);
     const ingredientRes = await res.json();
     ingredients.value = ingredientRes.data;
 
@@ -203,8 +201,6 @@ onMounted(async () => {
 
 // Item update
 const saveItemEdit = async () => {
-  const storeId = route.query.store_id;
-
   try {
     const res = await fetch(`http://localhost:3000/items/${route.params.id}`, {
       method: 'PATCH',
@@ -231,7 +227,7 @@ const deleteItem = async (item) => {
   const storeId = route.query.store_id;
 
   try {
-    const res = await fetch(`http://localhost:3000/items/${item.id}?store_id=${storeId}`, {
+    const res = await fetch(`http://localhost:3000/items/${item.id}`, {
       method: 'DELETE'
     });
 
@@ -250,7 +246,7 @@ const deleteItem = async (item) => {
 
 // Ingredient create
 const addIngredient = async () => {
-  const res = await fetch(`http://localhost:3000/ingredients?item_id=${route.params.id}`, {
+  const res = await fetch(`http://localhost:3000/items/${route.params.id}/ingredients`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(newIngredient.value)
@@ -281,7 +277,7 @@ const cancelIngredientEdit = () => {
 
 const saveIngredientEdit = async (id) => {
   try {
-    const res = await fetch(`http://localhost:3000/ingredients/${id}?item_id=${route.params.id}`, {
+    const res = await fetch(`http://localhost:3000/ingredients/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(editingData.value)

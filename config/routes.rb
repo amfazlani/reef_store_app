@@ -7,7 +7,18 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
-  resources :stores
-  resources :items
-  resources :ingredients
+  # Stores routes
+  resources :stores do
+    # Nested items routes under a store (contextual creation & listing)
+    resources :items, only: [:index, :create]
+  end
+
+  # Items routes (flat for show/edit/update/delete)
+  resources :items, only: [:show, :update, :destroy] do
+    # Nested ingredients routes under an item (contextual creation & listing)
+    resources :ingredients, only: [:index, :create]
+  end
+
+  # Ingredients routes (flat for show/edit/update/delete)
+  resources :ingredients, only: [:show, :update, :destroy]
 end
