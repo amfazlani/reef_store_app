@@ -1,0 +1,175 @@
+<template>
+  <Toast :show="showToast" />
+
+  <div class="max-w-7xl mx-auto px-4 py-6">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-bold">Stores</h1>
+      <router-link
+        to="/stores/new"
+        class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm font-medium rounded shadow"
+      >
+        <span class="text-lg">＋</span>
+        <span>New Store</span>
+      </router-link>
+    </div>
+
+    <div class="bg-white shadow rounded-lg p-6 space-y-4">
+      <div
+        v-for="store in stores"
+        :key="store.id"
+        class="flex items-start sm:items-center justify-between gap-4 border-b pb-4 last:border-b-0"
+      >
+        <!-- Logo -->
+        <div class="w-16 h-16 flex-shrink-0 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold text-xl">
+          {{ store.name[0] }}
+        </div>
+
+        <!-- Info or Edit Form -->
+        <div class="flex-1">
+          <template v-if="editingStoreId === store.id">
+            <input
+              v-model="editedStore.name"
+              class="w-full text-lg font-semibold text-blue-600 border-b border-gray-300 focus:outline-none mb-1"
+            />
+            <input
+              v-model="editedStore.address"
+              class="w-full text-sm text-gray-500 border-b border-gray-200 focus:outline-none mb-1"
+            />
+            <textarea
+              v-model="editedStore.description"
+              class="w-full text-sm text-gray-600 border border-gray-200 rounded px-2 py-1 resize-none"
+              rows="2"
+            />
+          </template>
+
+          <template v-else>
+            <router-link
+              :to="`/stores/${store.id}`"
+              class="text-lg font-semibold text-blue-600 hover:underline"
+            >
+              {{ store.name }}
+            </router-link>
+            <p class="text-sm text-gray-500">{{ store.address }}</p>
+            <p class="text-sm text-gray-600 mt-1 line-clamp-2">
+              {{ store.description }}
+            </p>
+          </template>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex gap-2 mt-2 sm:mt-0">
+          <template v-if="editingStoreId === store.id">
+            <button
+              @click="updateStore(store.id)"
+              class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs font-medium"
+            >
+              Save
+            </button>
+            <button
+              @click="cancelEdit"
+              class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-medium"
+            >
+              Cancel
+            </button>
+          </template>
+
+          <template v-else>
+            <button
+              @click="startEditing(store)"
+              class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded text-xs font-medium"
+            >
+              Edit
+            </button>
+            <button
+              @click="deleteStore(store.id)"
+              class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-medium"
+            >
+              Delete
+            </button>
+          </template>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted, inject } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import Toast from '../components/Toast.vue';
+
+const route = useRoute();
+const router = useRouter();
+
+const stores = ref([]);
+const editingStoreId = ref(null);
+const editedStore = ref({ name: '', description: '' });
+const showToast = inject('showToast');
+
+
+onMounted(() => {
+  if (route.query.success) {
+    // toastMessage.value = route.query.success;
+    // showToast.value = true;
+    router.replace({ query: {} }); // Clear query param
+  }
+
+  fetchStores();
+});
+
+const fetchStores = async () => {
+  try {
+    const res = await fetch('http://localhost:3000/stores');
+    const storeRes = await res.json();
+    stores.value = storeRes.data;
+  } catch (error) {
+    console.error('Failed to fetch stores:', error);
+  }
+};
+
+const startEditing = (store) => {
+  editingStoreId.value = store.id;
+  editedStore.value = { ...store };
+};
+
+const cancelEdit = () => {
+  editingStoreId.value = null;
+  editedStore.value = { name: '', address: '', description: '' };
+};
+
+const updateStore = async (id) => {
+  try {
+    const res = await fetch(`http://localhost:3000/stores/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(editedStore.value),
+    });
+
+    if (!res.ok) throw new Error('Failed to update');
+
+    const updated = await res.json();
+    const index = stores.value.findIndex((s) => s.id === id);
+    stores.value[index] = updated.data;
+
+    showToast(updated.message, 3000);
+
+    cancelEdit();
+  } catch (error) {
+    console.error('Error updating store:', error);
+  }
+};
+
+const deleteStore = async (id) => {
+  if (!confirm('Are you sure you want to delete this store?')) return;
+
+  try {
+    const res = await fetch(`http://localhost:3000/stores/${id}`, { method: 'DELETE' });
+    const deleted = await res.json();
+    stores.value = stores.value.filter((s) => s.id !== id);
+
+    showToast(deleted.message, 3000);
+  } catch (error) {
+    console.error('Error deleting store:', error);
+  }
+};
+</script>
