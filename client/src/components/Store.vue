@@ -62,7 +62,6 @@
 
   <div v-else>
     <p>Store not found.</p>
-    <router-link to="/">← Back to store list</router-link>
   </div>
 </template>
 
