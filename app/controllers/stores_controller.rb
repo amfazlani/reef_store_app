@@ -2,7 +2,13 @@ class StoresController < ApplicationController
   before_action :find_store, only: [:show, :update, :destroy]
 
   def index
-    @stores = Store.page(params[:page]).per(params[:limit] || 5)
+    @stores = Store.all
+
+    if params[:q].present?
+      @stores = filter_stores
+    end
+
+    @stores = @stores.page(params[:page]).per(params[:limit] || 5)
 
     render json: {
       data: @stores,
@@ -54,5 +60,9 @@ class StoresController < ApplicationController
 
   def find_store
     @store = Store.find(params[:id])
+  end
+
+  def filter_stores
+    @stores = @stores.where('name ILIKE ?', "%#{params[:q]}%")
   end
 end

@@ -11,6 +11,16 @@
       </router-link>
     </div>
 
+    <div class="mb-4 flex items-center gap-4">
+      <input
+        v-model="searchQuery"
+        @input="handleSearch"
+        type="text"
+        placeholder="Search stores..."
+        class="w-full max-w-sm px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-300"
+      />
+    </div>
+
     <div v-if="loading" class="text-center text-gray-500 py-8">Loading stores...</div>
 
     <div v-if="!loading && stores.length" class="bg-white shadow rounded-lg p-6 space-y-4">
@@ -131,6 +141,8 @@ const page = ref(1);           // current page
 const limit = 5;               // number of items per page
 const totalPages = ref(1);     // total pages from API
 const loading = ref(false);    // loading indicator
+const searchQuery = ref('');
+let searchTimeout = null;
 
 onMounted(() => {
   if (route.query.success) {
@@ -145,7 +157,7 @@ onMounted(() => {
 const fetchStores = async () => {
   try {
     loading.value = true;
-    const res = await fetch(`http://localhost:3000/stores?page=${page.value}&limit=${limit}`);
+    const res = await fetch(`http://localhost:3000/stores?page=${page.value}&limit=${limit}&q=${encodeURIComponent(searchQuery.value)}`);
     const storeRes = await res.json();
     stores.value = storeRes.data;
     totalPages.value = storeRes.meta.total_pages;
@@ -154,6 +166,14 @@ const fetchStores = async () => {
   } finally {
     loading.value = false;
   }
+};
+
+const handleSearch = () => {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    page.value = 1; // Reset to first page on new search
+    fetchStores();
+  }, 300); // debounce API calls
 };
 
 const startEditing = (store) => {
