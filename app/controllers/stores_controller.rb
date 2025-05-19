@@ -2,9 +2,17 @@ class StoresController < ApplicationController
   before_action :find_store, only: [:show, :update, :destroy]
 
   def index
-    @stores = Store.all.order(:name)
+    @stores = Store.page(params[:page]).per(params[:limit] || 5)
 
-    render json: { data: @stores, status: 200 }
+    render json: {
+      data: @stores,
+      meta: {
+        total: @stores.total_count,
+        page: @stores.current_page,
+        limit: @stores.limit_value,
+        total_pages: @stores.total_pages
+      }
+    }
   end
 
   def create
