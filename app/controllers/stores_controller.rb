@@ -11,7 +11,7 @@ class StoresController < ApplicationController
     @store = Store.new(store_params)
 
     if @store.save
-      render json: { data: @store }, status: 200
+      render json: { data: @store, message: 'Store created successfully', status: 200 }
     else
       render json: { errors: @store.errors }, status: 422
     end
@@ -19,7 +19,7 @@ class StoresController < ApplicationController
 
   def update
     if @store.update(store_params)
-      render json: { data: @store, status: 200 }
+      render json: { data: @store, message: 'Store updated successfully', status: 200 }
     else
       render json: { errors: @store.errors }, status: 422
     end
@@ -27,7 +27,7 @@ class StoresController < ApplicationController
 
   def destroy
     if @store.destroy
-      render json: { data: @store, status: 200 }
+      render json: { data: @store, message: 'Store deleted successfully', status: 200 }
     else
       render json: { errors: @store.errors }, status: 422
     end
