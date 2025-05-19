@@ -3,4 +3,3 @@ module JsonHelpers
     JSON.parse(response.body)
   end
 end
-

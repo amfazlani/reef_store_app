@@ -1,6 +1,6 @@
 class IngredientsController < ApplicationController
-  before_action :find_item, only: [:index, :create]
-  before_action :find_ingredient, only: [:show, :update, :destroy]
+  before_action :find_item, only: [ :index, :create ]
+  before_action :find_ingredient, only: [ :show, :update, :destroy ]
 
   def index
     @ingredients = @item.ingredients
@@ -12,7 +12,7 @@ class IngredientsController < ApplicationController
     @ingredient = Ingredient.new(ingredient_params.merge(item_id: @item.id))
 
     if @ingredient.save
-      render json: { data: @ingredient, message: 'Ingredient created successfully', status: 200 }
+      render json: { data: @ingredient, message: "Ingredient created successfully", status: 200 }
     else
       render json: { errors: @ingredient.errors }, status: 422
     end
@@ -20,7 +20,7 @@ class IngredientsController < ApplicationController
 
   def update
     if @ingredient.update(ingredient_params)
-      render json: { data: @ingredient, message: 'Ingredient updated successfully', status: 200 }
+      render json: { data: @ingredient, message: "Ingredient updated successfully", status: 200 }
     else
       render json: { errors: @ingredient.errors }, status: 422
     end
@@ -28,7 +28,7 @@ class IngredientsController < ApplicationController
 
   def destroy
     if @ingredient.destroy
-      render json: { data: @ingredient, message: 'Ingredient deleted successfully', status: 200 }
+      render json: { data: @ingredient, message: "Ingredient deleted successfully", status: 200 }
     else
       render json: { errors: @ingredient.errors }, status: 422
     end

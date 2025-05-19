@@ -1,6 +1,6 @@
 class ItemsController < ApplicationController
-  before_action :find_store, only: [:index, :create]
-  before_action :find_item, only: [:show, :update, :destroy]
+  before_action :find_store, only: [ :index, :create ]
+  before_action :find_item, only: [ :show, :update, :destroy ]
 
   def index
     @items = @store.items
@@ -12,7 +12,7 @@ class ItemsController < ApplicationController
     @item = Item.new(item_params.merge(store_id: @store.id))
 
     if @item.save
-      render json: { data: @item, message: 'item created successfully', status: 200 }
+      render json: { data: @item, message: "item created successfully", status: 200 }
     else
       render json: { errors: @item.errors }, status: 422
     end
@@ -20,7 +20,7 @@ class ItemsController < ApplicationController
 
   def update
     if @item.update(item_params)
-      render json: { data: @item, message: 'item updated successfully', status: 200 }
+      render json: { data: @item, message: "item updated successfully", status: 200 }
     else
       render json: { errors: @item.errors }, status: 422
     end
@@ -28,7 +28,7 @@ class ItemsController < ApplicationController
 
   def destroy
     if @item.destroy
-      render json: { data: @item, message: 'item deleted successfully', status: 200 }
+      render json: { data: @item, message: "item deleted successfully", status: 200 }
     else
       render json: { errors: @item.errors }, status: 422
     end

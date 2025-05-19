@@ -11,7 +11,7 @@ RSpec.describe 'Items', type: :request do
     {
       "item": {
         "name": 'Item A',
-        "price": 19.99,
+        "price": 19.99
       }
     }
   }
@@ -20,7 +20,7 @@ RSpec.describe 'Items', type: :request do
     {
       "item": {
         "name": 'Updated Item',
-        "price": 19.99,
+        "price": 19.99
       }
     }
   }
@@ -30,7 +30,7 @@ RSpec.describe 'Items', type: :request do
     {
       "item": {
         "name": '',
-        "price": 19.99,
+        "price": 19.99
       }
     }
   }
@@ -92,7 +92,7 @@ RSpec.describe 'Items', type: :request do
       end
 
       it 'returns a validation failure message' do
-        expect(parsed_response['errors']['name']).to eq(["can't be blank"])
+        expect(parsed_response['errors']['name']).to eq([ "can't be blank" ])
       end
     end
   end
@@ -119,7 +119,7 @@ RSpec.describe 'Items', type: :request do
       end
 
       it 'returns a validation failure message' do
-        expect(parsed_response['errors']['name']).to eq(["can't be blank"])
+        expect(parsed_response['errors']['name']).to eq([ "can't be blank" ])
       end
     end
   end

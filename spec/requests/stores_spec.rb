@@ -95,7 +95,7 @@ RSpec.describe 'Stores', type: :request do
       end
 
       it 'returns a validation failure message' do
-        expect(parsed_response['errors']['name']).to eq(["can't be blank"])
+        expect(parsed_response['errors']['name']).to eq([ "can't be blank" ])
       end
     end
   end
@@ -122,7 +122,7 @@ RSpec.describe 'Stores', type: :request do
       end
 
       it 'returns a validation failure message' do
-        expect(parsed_response['errors']['name']).to eq(["can't be blank"])
+        expect(parsed_response['errors']['name']).to eq([ "can't be blank" ])
       end
     end
   end

@@ -11,7 +11,7 @@ RSpec.describe 'Ingredients', type: :request do
     {
       "ingredient": {
         "name": 'Item A',
-        "quantity": 2,
+        "quantity": 2
       }
     }
   }
@@ -20,7 +20,7 @@ RSpec.describe 'Ingredients', type: :request do
     {
       "ingredient": {
         "name": 'Updated Ingredient',
-        "quantity": 2,
+        "quantity": 2
       }
     }
   }
@@ -30,7 +30,7 @@ RSpec.describe 'Ingredients', type: :request do
     {
       "ingredient": {
         "name": '',
-        "quantity": 2,
+        "quantity": 2
       }
     }
   }
@@ -92,7 +92,7 @@ RSpec.describe 'Ingredients', type: :request do
       end
 
       it 'returns a validation failure message' do
-        expect(parsed_response['errors']['name']).to eq(["can't be blank"])
+        expect(parsed_response['errors']['name']).to eq([ "can't be blank" ])
       end
     end
   end
@@ -119,7 +119,7 @@ RSpec.describe 'Ingredients', type: :request do
       end
 
       it 'returns a validation failure message' do
-        expect(parsed_response['errors']['name']).to eq(["can't be blank"])
+        expect(parsed_response['errors']['name']).to eq([ "can't be blank" ])
       end
     end
   end
