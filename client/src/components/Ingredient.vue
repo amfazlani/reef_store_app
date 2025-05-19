@@ -1,17 +1,57 @@
-<!-- src/components/IngredientItem.vue -->
 <template>
-  <li>
-    <template v-if="isEditing">
-      <input v-model="localIngredient.name" placeholder="Name" />
-      <input v-model="localIngredient.quantity" placeholder="Quantity" />
-      <button @click="saveEdit">💾 Save</button>
-      <button @click="cancelEdit">✖ Cancel</button>
-    </template>
-    <template v-else>
-      <strong>{{ ingredient.name }}</strong>: {{ ingredient.quantity }}
-      <button @click="startEdit">✏️ Edit</button>
-      <button @click="deleteIngredient">🗑 Delete</button>
-    </template>
+  <li class="bg-gray-50 border border-gray-200 rounded p-4 hover:shadow-sm">
+    <div v-if="isEditing" class="space-y-2">
+      <input
+        v-model="editingData.name"
+        placeholder="Ingredient Name"
+        class="w-full border px-3 py-2 rounded"
+      />
+      <input
+        v-model="editingData.quantity"
+        placeholder="Quantity"
+        class="w-full border px-3 py-2 rounded"
+      />
+      <div class="flex gap-2">
+        <button
+          @click="save"
+          class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+        >
+          💾 Save
+        </button>
+        <button
+          @click="cancel"
+          class="bg-gray-300 px-3 py-1 rounded hover:bg-gray-400"
+        >
+          ❌ Cancel
+        </button>
+      </div>
+    </div>
+
+    <div v-else class="flex justify-between items-center">
+      <div>
+        <p class="text-gray-800 font-medium">{{ ingredient.name }}</p>
+        <p v-if="!ingredient.quantity || ingredient.quantity == 0" class="text-red-500 text-sm">
+          🔴 Out of Stock
+        </p>
+        <p v-else class="text-green-600 text-sm">
+          🟢 In Stock: {{ ingredient.quantity }}
+        </p>
+      </div>
+      <div class="flex gap-2">
+        <button
+          @click="edit"
+          class="text-blue-600 hover:underline text-sm"
+        >
+          ✏️ Edit
+        </button>
+        <button
+          @click="destroy"
+          class="text-red-600 hover:underline text-sm"
+        >
+          🗑 Delete
+        </button>
+      </div>
+    </div>
   </li>
 </template>
 
@@ -26,61 +66,52 @@ const emit = defineEmits(['updated', 'deleted']);
 const showToast = inject('showToast');
 
 const isEditing = ref(false);
-const localIngredient = ref({ ...props.ingredient });
+const editingData = ref({ name: '', quantity: '' });
 
-const startEdit = () => {
-  localIngredient.value = { ...props.ingredient };
+const edit = () => {
   isEditing.value = true;
+  editingData.value = { ...props.ingredient };
 };
 
-const cancelEdit = () => {
+const cancel = () => {
   isEditing.value = false;
 };
 
-const saveEdit = async () => {
+const save = async () => {
   try {
     const res = await fetch(`http://localhost:3000/ingredients/${props.ingredient.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(localIngredient.value)
+      body: JSON.stringify(editingData.value)
     });
-    if (!res.ok) throw new Error('Update failed');
-    const updated = await res.json();
-    emit('updated', updated);
-    isEditing.value = false;
 
-    showToast(updated.message)
-  } catch (error) {
-    alert('Failed to update ingredient.');
-    console.error(error);
+    if (!res.ok) throw new Error('Failed to update ingredient');
+    const updated = await res.json();
+
+    emit('updated', updated);
+    showToast?.(updated.message || 'Ingredient updated');
+    isEditing.value = false;
+  } catch (err) {
+    console.error(err);
+    alert('Failed to save ingredient.');
   }
 };
 
-const deleteIngredient = async () => {
-  if (!confirm('Delete this ingredient?')) return;
+const destroy = async () => {
+  if (!confirm('Are you sure you want to delete this ingredient?')) return;
+
   try {
     const res = await fetch(`http://localhost:3000/ingredients/${props.ingredient.id}`, {
       method: 'DELETE'
     });
-    const deleted = await res.json();
-    if (!res.ok) throw new Error('Delete failed');
 
-    showToast(deleted.message)
-    emit('deleted', props.ingredient.id);
-  } catch (error) {
+    if (!res.ok) throw new Error('Failed to delete ingredient');
+    const deleted = await res.json();
+    emit('deleted', deleted);
+    showToast?.(deleted.message || 'Ingredient deleted');
+  } catch (err) {
+    console.error(err);
     alert('Failed to delete ingredient.');
-    console.error(error);
   }
 };
 </script>
-
-<style scoped>
-input {
-  margin: 0.2rem 0.5rem 0.2rem 0;
-  padding: 0.3rem;
-}
-button {
-  margin-left: 0.4rem;
-  cursor: pointer;
-}
-</style>

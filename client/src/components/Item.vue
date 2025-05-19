@@ -80,66 +80,14 @@
       </transition>
 
       <ul v-if="ingredients.length" class="space-y-4">
-        <li
+        <Ingredient
           v-for="ingredient in ingredients"
           :key="ingredient.id"
-          class="bg-gray-50 border border-gray-200 rounded p-4 hover:shadow-sm"
-        >
-          <div v-if="editingId === ingredient.id" class="space-y-2">
-            <input
-              v-model="editingData.name"
-              placeholder="Ingredient Name"
-              class="w-full border px-3 py-2 rounded"
-            />
-            <input
-              v-model="editingData.quantity"
-              placeholder="Quantity"
-              class="w-full border px-3 py-2 rounded"
-            />
-            <div class="flex gap-2">
-              <button
-                @click="saveIngredientEdit(ingredient.id)"
-                class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
-              >
-                💾 Save
-              </button>
-              <button
-                @click="cancelIngredientEdit"
-                class="bg-gray-300 px-3 py-1 rounded hover:bg-gray-400"
-              >
-                ❌ Cancel
-              </button>
-            </div>
-          </div>
-
-          <div v-else class="flex justify-between items-center">
-            <div>
-              <p class="text-gray-800 font-medium">{{ ingredient.name }}</p>
-              <p v-if="!ingredient.quantity || ingredient.quantity == 0" class="text-red-500 text-sm">
-                🔴 Out of Stock
-              </p>
-              <p v-else class="text-green-600 text-sm">
-                🟢 In Stock: {{ ingredient.quantity }}
-              </p>
-            </div>
-            <div class="flex gap-2">
-              <button
-                @click="editIngredient(ingredient)"
-                class="text-blue-600 hover:underline text-sm"
-              >
-                ✏️ Edit
-              </button>
-              <button
-                @click="deleteIngredient(ingredient.id)"
-                class="text-red-600 hover:underline text-sm"
-              >
-                🗑 Delete
-              </button>
-            </div>
-          </div>
-        </li>
+          :ingredient="ingredient"
+          @updated="handleIngredientUpdate"
+          @deleted="handleIngredientDelete"
+        />
       </ul>
-
       <!-- No Ingredients Message -->
       <p
         v-else
@@ -159,6 +107,7 @@
 <script setup>
 import { ref, onMounted, inject } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import Ingredient from '../components/Ingredient.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -174,10 +123,6 @@ const showAddForm = ref(false);
 // Inline editing for item
 const isEditingItem = ref(false);
 const editedItem = ref({ name: '', price: '', description: '' });
-
-// Inline editing for ingredients
-const editingId = ref(null);
-const editingData = ref({ name: '', quantity: '' });
 
 onMounted(async () => {
   try {
@@ -261,55 +206,6 @@ const addIngredient = async () => {
     showToast(created.message)
   } else {
     alert('Failed to add ingredient');
-  }
-};
-
-// Ingredient edit setup
-const editIngredient = (ingredient) => {
-  editingId.value = ingredient.id;
-  editingData.value = { name: ingredient.name, quantity: ingredient.quantity };
-};
-
-const cancelIngredientEdit = () => {
-  editingId.value = null;
-  editingData.value = { name: '', quantity: '' };
-};
-
-const saveIngredientEdit = async (id) => {
-  try {
-    const res = await fetch(`http://localhost:3000/ingredients/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(editingData.value)
-    });
-
-    if (!res.ok) throw new Error('Failed to update ingredient');
-
-    const updated = await res.json();
-    handleIngredientUpdate(updated);
-    cancelIngredientEdit();
-  } catch (err) {
-    alert('Failed to save ingredient.');
-    console.error(err);
-  }
-};
-
-const deleteIngredient = async (id) => {
-  if (!confirm('Are you sure you want to delete this ingredient?')) return;
-
-  try {
-    const res = await fetch(`http://localhost:3000/ingredients/${id}`, {
-      method: 'DELETE'
-    });
-
-    if (!res.ok) throw new Error('Failed to delete ingredient');
-
-    const deleted = await res.json();
-
-    handleIngredientDelete(deleted);
-  } catch (err) {
-    alert('Failed to delete ingredient.');
-    console.error(err);
   }
 };
 
