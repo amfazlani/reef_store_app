@@ -11,7 +11,9 @@
       </router-link>
     </div>
 
-    <div class="bg-white shadow rounded-lg p-6 space-y-4">
+    <div v-if="loading" class="text-center text-gray-500 py-8">Loading stores...</div>
+
+    <div v-if="!loading && stores.length" class="bg-white shadow rounded-lg p-6 space-y-4">
       <div
         v-for="store in stores"
         :key="store.id"
@@ -88,6 +90,28 @@
         </div>
       </div>
     </div>
+
+    <!-- Pagination Controls -->
+<div class="flex justify-between items-center pt-4 border-t">
+  <button
+    @click="prevPage"
+    :disabled="page === 1"
+    class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50"
+  >
+    ← Prev
+  </button>
+
+  <span class="text-sm text-gray-600">Page {{ page }} of {{ totalPages }}</span>
+
+  <button
+    @click="nextPage"
+    :disabled="page === totalPages"
+    class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50"
+  >
+    Next →
+  </button>
+</div>
+
   </div>
 </template>
 
@@ -103,7 +127,10 @@ const stores = ref([]);
 const editingStoreId = ref(null);
 const editedStore = ref({ name: '', description: '' });
 const showToast = inject('showToast');
-
+const page = ref(1);           // current page
+const limit = 5;               // number of items per page
+const totalPages = ref(1);     // total pages from API
+const loading = ref(false);    // loading indicator
 
 onMounted(() => {
   if (route.query.success) {
@@ -117,11 +144,15 @@ onMounted(() => {
 
 const fetchStores = async () => {
   try {
-    const res = await fetch('http://localhost:3000/stores');
+    loading.value = true;
+    const res = await fetch(`http://localhost:3000/stores?page=${page.value}&limit=${limit}`);
     const storeRes = await res.json();
     stores.value = storeRes.data;
+    totalPages.value = storeRes.meta.total_pages;
   } catch (error) {
     console.error('Failed to fetch stores:', error);
+  } finally {
+    loading.value = false;
   }
 };
 
@@ -168,6 +199,21 @@ const deleteStore = async (id) => {
     showToast(deleted.message, 3000);
   } catch (error) {
     console.error('Error deleting store:', error);
+  }
+};
+
+// Add these
+const nextPage = () => {
+  if (page.value < totalPages.value) {
+    page.value++;
+    fetchStores();
+  }
+};
+
+const prevPage = () => {
+  if (page.value > 1) {
+    page.value--;
+    fetchStores();
   }
 };
 </script>
