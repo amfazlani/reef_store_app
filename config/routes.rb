@@ -10,7 +10,11 @@ Rails.application.routes.draw do
   # Stores routes
   resources :stores do
     # Nested items routes under a store (contextual creation & listing)
-    resources :items, only: [ :index, :create ]
+    resources :items, only: [ :index, :create ] do
+      collection do
+        get :count
+      end
+    end
   end
 
   # Items routes (flat for show/edit/update/delete)

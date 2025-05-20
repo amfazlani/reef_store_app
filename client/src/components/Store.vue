@@ -15,6 +15,10 @@
         <p class="text-gray-700 text-sm">{{ store.description }}</p>
       </div>
 
+      <div class="mt-4 text-blue-700 font-medium">
+        Total Items: {{ itemCount }}
+      </div>
+
       <router-link
       :to="`/stores/${store.id}/edit?mode=edit`"
       class="inline-block bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium shadow hover:bg-blue-600 transition mb-4"
@@ -74,6 +78,7 @@ import ItemForm from '../components/ItemForm.vue';
 const route = useRoute();
 const store = ref(null);
 const items = ref([]);
+const itemCount = ref(0);
 const loading = ref(true);
 const showForm = ref(false);
 const showToast = inject('showToast');
@@ -86,16 +91,23 @@ onMounted(async () => {
     const storeRes = await fetch(`http://localhost:3000/stores/${storeId}`);
     if (!storeRes.ok) throw new Error('Failed to load store');
     
-   const data = await storeRes.json()
-   store.value = data.data
+    const data = await storeRes.json()
+    store.value = data.data
 
 
     // Fetch store items
     const itemsRes = await fetch(`http://localhost:3000/stores/${storeId}/items`);
     if (!itemsRes.ok) throw new Error('Failed to load items');
     
-   const itemData = await itemsRes.json()
-   items.value = itemData.data
+    const itemData = await itemsRes.json()
+    items.value = itemData.data
+
+    // Fetch item count
+    const countRes = await fetch(`http://localhost:3000/stores/${storeId}/items/count`);
+    if (!countRes.ok) throw new Error('Failed to load item count');
+
+    const countData = await countRes.json();
+    itemCount.value = countData.data;
   } catch (error) {
     console.error(error);
   } finally {
@@ -114,6 +126,7 @@ const createItem = async (newItem) => {
     if (!res.ok) throw new Error('Failed to create item');
     const created = await res.json();
     items.value.push(created.data);
+    itemCount.value++; // update count after adding item
     showForm.value = false; // hide form after submission
 
     showToast(created.message)

@@ -1,5 +1,5 @@
 class ItemsController < ApplicationController
-  before_action :find_store, only: [ :index, :create ]
+  before_action :find_store, only: [ :index, :create, :count]
   before_action :find_item, only: [ :show, :update, :destroy ]
 
   def index
@@ -36,6 +36,12 @@ class ItemsController < ApplicationController
 
   def show
     render json: { data: @item, status: 200 }
+  end
+
+  def count
+    count = @store.items.count
+
+    render json: { data: count, status: 200 }
   end
 
   private
