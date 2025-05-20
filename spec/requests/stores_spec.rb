@@ -70,6 +70,16 @@ RSpec.describe 'Stores', type: :request do
         end
       end
     end
+
+    context 'when the record does not exist' do
+      let!(:store_id) { 100 }
+
+      before { get store_path(store_id) }
+
+      it 'returns status code 404' do
+        expect(response).to have_http_status(404)
+      end
+    end
   end
 
   describe '#create' do

@@ -53,19 +53,27 @@ RSpec.describe 'Items', type: :request do
   # Test suite for GET /branches/:id
   describe '#show' do
     context 'when the record exists' do
-      context 'with permissions' do
-        before do
-          get item_path(item)
-        end
+      before do
+        get item_path(item)
+      end
 
-        it 'returns the store' do
-          expect(parsed_response["data"]).not_to be_nil
-          expect(parsed_response["data"]["id"]).to eq(item.id)
-        end
+      it 'returns the store' do
+        expect(parsed_response["data"]).not_to be_nil
+        expect(parsed_response["data"]["id"]).to eq(item.id)
+      end
 
-        it 'returns status code 200' do
-          expect(response).to have_http_status(200)
-        end
+      it 'returns status code 200' do
+        expect(response).to have_http_status(200)
+      end
+    end
+
+    context 'when the record does not exist' do
+      let!(:item_id) { 100 }
+
+      before { get item_path(item_id) }
+
+      it 'returns status code 404' do
+        expect(response).to have_http_status(404)
       end
     end
   end

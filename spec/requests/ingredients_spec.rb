@@ -53,19 +53,17 @@ RSpec.describe 'Ingredients', type: :request do
   # Test suite for GET /branches/:id
   describe '#show' do
     context 'when the record exists' do
-      context 'with permissions' do
-        before do
-          get ingredient_path(ingredient)
-        end
+      before do
+        get ingredient_path(ingredient)
+      end
 
-        it 'returns the store' do
-          expect(parsed_response["data"]).not_to be_nil
-          expect(parsed_response["data"]["id"]).to eq(ingredient.id)
-        end
+      it 'returns the store' do
+        expect(parsed_response["data"]).not_to be_nil
+        expect(parsed_response["data"]["id"]).to eq(ingredient.id)
+      end
 
-        it 'returns status code 200' do
-          expect(response).to have_http_status(200)
-        end
+      it 'returns status code 200' do
+        expect(response).to have_http_status(200)
       end
     end
   end
