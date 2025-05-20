@@ -132,7 +132,7 @@ RSpec.describe 'Stores', type: :request do
       end
 
       it 'returns a validation failure message' do
-        expect(parsed_response['errors']).to eq(["Name can't be blank" ])
+        expect(parsed_response['errors']).to eq([ "Name can't be blank" ])
       end
     end
   end
