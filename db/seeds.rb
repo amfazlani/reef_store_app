@@ -8,6 +8,16 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
-5.times do
-  Store.create(name: Faker::Company.name, address: Faker::Address.full_address)
+if Store.count.zero?
+  5.times do
+    @store = Store.create(name: Faker::Company.name, address: Faker::Address.full_address)
+
+    5.times do
+      @item = @store.items.create(name: Faker::Lorem.word, price: Faker::Number.decimal(l_digits: 2))
+
+      5.times do
+        @item.ingredients.create(name: Faker::Lorem.word, quantity: Faker::Number.number(digits: 1))
+      end
+    end
+  end
 end

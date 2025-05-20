@@ -6,7 +6,7 @@ set -e
 rm -f tmp/pids/server.pid
 
 # Run migrations (dev only — be cautious in prod!)
-bundle exec rails db:rollback db:migrate db:seed
+bundle exec rails db:migrate db:seed
 
 # Start the server
 exec "$@"
