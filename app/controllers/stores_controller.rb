@@ -27,7 +27,7 @@ class StoresController < ApplicationController
     if @store.save
       render json: { data: @store, message: "Store created successfully", status: 200 }
     else
-      render json: { errors: @store.errors }, status: 422
+      render json: { errors: @store.errors.full_messages }, status: 422
     end
   end
 
@@ -35,7 +35,7 @@ class StoresController < ApplicationController
     if @store.update(store_params)
       render json: { data: @store, message: "Store updated successfully", status: 200 }
     else
-      render json: { errors: @store.errors }, status: 422
+      render json: { errors: @store.errors.full_messages }, status: 422
     end
   end
 
@@ -43,7 +43,7 @@ class StoresController < ApplicationController
     if @store.destroy
       render json: { data: @store, message: "Store deleted successfully", status: 200 }
     else
-      render json: { errors: @store.errors }, status: 422
+      render json: { errors: @store.errors.full_messages }, status: 422
     end
   end
 

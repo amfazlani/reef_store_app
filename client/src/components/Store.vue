@@ -130,16 +130,16 @@ const createItem = async (newItem) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newItem)
     });
-    if (!res.ok) throw new Error('Failed to create item');
     const created = await res.json();
+
+    if (!res.ok) throw new Error(created.errors);
     items.value.push(created.data);
     itemCount.value++; // update count after adding item
     showForm.value = false; // hide form after submission
 
     showToast(created.message)
   } catch (error) {
-    console.error(error);
-    alert('Error creating item');
+    showToast(error, 'error');
   }
 };
 </script>

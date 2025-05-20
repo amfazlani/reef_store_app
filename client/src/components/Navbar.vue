@@ -4,7 +4,7 @@
       <h1 class="text-xl font-bold">Marketplace App</h1>
       <ul class="flex space-x-4">
         <li>
-          <router-link to="/" class="hover:underline">🏠 Stores</router-link>
+          <router-link to="/" class="hover:text-white">🏠 Stores</router-link>
         </li>
       </ul>
     </div>

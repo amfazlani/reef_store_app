@@ -79,8 +79,7 @@ onMounted(async () => {
       address.value = data.data.address
       description.value = data.data.description
     } catch (error) {
-      console.error(error)
-      alert('Failed to load store')
+      showToast(error, 'error');
     }
   }
 })
@@ -104,10 +103,10 @@ const handleSubmit = async () => {
         description: description.value
       })
     })
-
-    if (!res.ok) throw new Error('Failed to save store')
-
     const redData = await res.json()
+
+    if (!res.ok) throw new Error(redData.errors)
+
     router.push({
       path: `/stores/${redData.data.id}`,
       query: {
@@ -116,9 +115,8 @@ const handleSubmit = async () => {
     })
 
     showToast(redData.message)
-  } catch (err) {
-    console.error(err)
-    alert('Failed to save store.')
+  } catch (error) {
+    showToast(error, 'error');
   }
 }
 </script>

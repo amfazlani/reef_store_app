@@ -102,6 +102,9 @@
     <p>Loading item...</p>
   </div>
 
+  <div v-else>
+    <p>Item not found.</p>
+  </div>
 </template>
 
 <script setup>
@@ -128,8 +131,8 @@ onMounted(async () => {
   try {
     // Fetch item
     const response = await fetch(`http://localhost:3000/items/${route.params.id}`);
-    if (!response.ok) throw new Error('Failed to fetch item');
     const itemRes = await response.json();
+    if (!response.ok) throw new Error(itemRes.errors);
     item.value = itemRes.data;
 
     // Fetch ingredients
@@ -138,7 +141,7 @@ onMounted(async () => {
     ingredients.value = ingredientRes.data;
 
   } catch (error) {
-    console.error(error);
+    showToast(error, 'error');
   } finally {
     loading.value = false;
   }
@@ -152,17 +155,16 @@ const saveItemEdit = async () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(editedItem.value)
     });
-
-    if (!res.ok) throw new Error('Failed to update item');
-
     const updated = await res.json();
+
+    if (!res.ok) throw new Error(updated.errors);
+
     item.value = updated.data;
     isEditingItem.value = false;
 
     showToast(updated.message)
-  } catch (err) {
-    alert('Failed to save item.');
-    console.error(err);
+  } catch (error) {
+    showToast(error, 'error');
   }
 };
 
@@ -176,16 +178,15 @@ const deleteItem = async (item) => {
       method: 'DELETE'
     });
 
-    if (!res.ok) throw new Error('Failed to delete item');
-
     const deleted = await res.json();
+
+    if (!res.ok) throw new Error(deleted.errors);
 
     router.push(`/stores/${storeId}`);
 
     showToast(deleted.message)
   } catch (error) {
-    console.error(error);
-    alert('Could not delete item');
+    showToast(error, 'error');
   }
 };
 
@@ -196,16 +197,16 @@ const addIngredient = async () => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(newIngredient.value)
   });
+  const created = await res.json();
 
   if (res.ok) {
-    const created = await res.json();
     ingredients.value.push(created.data);
     newIngredient.value = { name: '', quantity: '' };
     showAddForm.value = false;
 
     showToast(created.message)
   } else {
-    alert('Failed to add ingredient');
+    showToast(created.errors.join(', '), 'error');
   }
 };
 

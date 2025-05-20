@@ -155,7 +155,7 @@ const fetchStores = async () => {
     stores.value = storeRes.data;
     totalPages.value = storeRes.meta.total_pages;
   } catch (error) {
-    console.error('Failed to fetch stores:', error);
+    showToast(error, 'error');
   } finally {
     loading.value = false;
   }
@@ -186,10 +186,10 @@ const updateStore = async (id) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(editedStore.value),
     });
-
-    if (!res.ok) throw new Error('Failed to update');
-
     const updated = await res.json();
+
+    if (!res.ok) throw new Error(updated.errors);
+
     const index = stores.value.findIndex((s) => s.id === id);
     stores.value[index] = updated.data;
 
@@ -197,7 +197,7 @@ const updateStore = async (id) => {
 
     cancelEdit();
   } catch (error) {
-    console.error('Error updating store:', error);
+    showToast(error, 'error');
   }
 };
 
@@ -211,7 +211,7 @@ const deleteStore = async (id) => {
 
     showToast(deleted.message, 3000);
   } catch (error) {
-    console.error('Error deleting store:', error);
+    showToast(error, 'error');
   }
 };
 

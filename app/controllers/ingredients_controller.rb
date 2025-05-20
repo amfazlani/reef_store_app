@@ -14,7 +14,7 @@ class IngredientsController < ApplicationController
     if @ingredient.save
       render json: { data: @ingredient, message: "Ingredient created successfully", status: 200 }
     else
-      render json: { errors: @ingredient.errors }, status: 422
+      render json: { errors: @ingredient.errors.full_messages }, status: 422
     end
   end
 
@@ -22,7 +22,7 @@ class IngredientsController < ApplicationController
     if @ingredient.update(ingredient_params)
       render json: { data: @ingredient, message: "Ingredient updated successfully", status: 200 }
     else
-      render json: { errors: @ingredient.errors }, status: 422
+      render json: { errors: @ingredient.errors.full_messages }, status: 422
     end
   end
 
@@ -30,7 +30,7 @@ class IngredientsController < ApplicationController
     if @ingredient.destroy
       render json: { data: @ingredient, message: "Ingredient deleted successfully", status: 200 }
     else
-      render json: { errors: @ingredient.errors }, status: 422
+      render json: { errors: @ingredient.errors.full_messages }, status: 422
     end
   end
 

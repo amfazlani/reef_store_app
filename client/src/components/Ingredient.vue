@@ -84,16 +84,15 @@ const save = async () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(editingData.value)
     });
-
-    if (!res.ok) throw new Error('Failed to update ingredient');
     const updated = await res.json();
+
+    if (!res.ok) throw new Error(updated.errors);
 
     emit('updated', updated);
     showToast?.(updated.message || 'Ingredient updated');
     isEditing.value = false;
-  } catch (err) {
-    console.error(err);
-    alert('Failed to save ingredient.');
+  } catch (error) {
+    showToast(error, 'error');
   }
 };
 
@@ -104,14 +103,14 @@ const destroy = async () => {
     const res = await fetch(`http://localhost:3000/ingredients/${props.ingredient.id}`, {
       method: 'DELETE'
     });
-
-    if (!res.ok) throw new Error('Failed to delete ingredient');
     const deleted = await res.json();
+
+    if (!res.ok) throw new Error(deleted.errors);
+
     emit('deleted', deleted);
     showToast?.(deleted.message || 'Ingredient deleted');
-  } catch (err) {
-    console.error(err);
-    alert('Failed to delete ingredient.');
+  } catch (error) {
+    showToast(error, 'error');
   }
 };
 </script>

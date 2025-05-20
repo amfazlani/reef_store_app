@@ -14,7 +14,7 @@ class ItemsController < ApplicationController
     if @item.save
       render json: { data: @item, message: "item created successfully", status: 200 }
     else
-      render json: { errors: @item.errors }, status: 422
+      render json: { errors: @item.errors.full_messages }, status: 422
     end
   end
 
@@ -22,7 +22,7 @@ class ItemsController < ApplicationController
     if @item.update(item_params)
       render json: { data: @item, message: "item updated successfully", status: 200 }
     else
-      render json: { errors: @item.errors }, status: 422
+      render json: { errors: @item.errors.full_messages }, status: 422
     end
   end
 
@@ -30,7 +30,7 @@ class ItemsController < ApplicationController
     if @item.destroy
       render json: { data: @item, message: "item deleted successfully", status: 200 }
     else
-      render json: { errors: @item.errors }, status: 422
+      render json: { errors: @item.errors.full_messages }, status: 422
     end
   end
 
