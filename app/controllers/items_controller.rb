@@ -1,5 +1,5 @@
 class ItemsController < ApplicationController
-  before_action :find_store, only: [ :index, :create, :count]
+  before_action :find_store, only: [ :index, :create, :count ]
   before_action :find_item, only: [ :show, :update, :destroy ]
 
   def index
