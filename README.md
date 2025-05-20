@@ -286,9 +286,10 @@ RAILS_ENV=test rails db:create db:migrate
 | DELETE | `/stores/:id`    | Delete a store       |
 | GET    | `/stores/:store_id/items` | List items for a store        |
 | POST   | `/stores/:store_id/items` | Create item for a store       |
+| GET    | `/stores/:store_id/items/count` | List store's item count |
 | GET    | `/items/:id`              | Show an item                  |
 | PATCH  | `/items/:id`              | Update an item                |
-| DELETE | `/items/:id`              | Delete an item                |         |
+| DELETE | `/items/:id`              | Delete an item                |
 | GET    | `/items/:item_id/ingredients` | List ingredients for item |
 | POST   | `/items/:item_id/ingredients` | Create an ingredient      |
 | GET    | `/ingredients/:id`            | Show an ingredient        |
