@@ -33,7 +33,7 @@ const routes = [
     component: StoreForm
   },
   { 
-    path: '/items/:id',
+    path: '/stores/:store_id/items/:id',
     name: 'Item',
     component: Item,
     props: true 

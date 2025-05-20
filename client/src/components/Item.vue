@@ -4,7 +4,7 @@
     <div class="max-w-4xl mx-auto mt-12 px-4">
       <!-- Back Link -->
       <router-link
-        :to="{ name: 'Store', params: { id: route.query.store_id } }"
+        :to="{ name: 'Store', params: { id: route.params.store_id } }"
         class="text-blue-600 hover:underline text-sm mb-6 inline-block"
       >
         ← Back to Store
@@ -169,7 +169,7 @@ const saveItemEdit = async () => {
 const deleteItem = async (item) => {
   if (!confirm('Are you sure you want to delete this item?')) return;
 
-  const storeId = route.query.store_id;
+  const storeId = route.params.store_id;
 
   try {
     const res = await fetch(`http://localhost:3000/items/${item.id}`, {

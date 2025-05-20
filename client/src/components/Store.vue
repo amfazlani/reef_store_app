@@ -1,5 +1,6 @@
 <template>
-  <router-link to="/">← Back to store list</router-link>
+  <router-link to="/" class="text-blue-600 hover:underline text-sm mb-6 inline-block"
+>← Back to store list</router-link>
   <div v-if="store">
     <!-- Store Info Card -->
     <div class="bg-white rounded-lg shadow p-6 flex flex-col sm:flex-row items-start sm:items-center gap-6 mb-8">
@@ -21,14 +22,14 @@
 
       <router-link
       :to="`/stores/${store.id}/edit?mode=edit`"
-      class="inline-block bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium shadow hover:bg-blue-600 transition mb-4"
-    >
-      ✏️ Edit Store
-    </router-link>
-  </div>
+      class="inline-block bg-blue-500 hover:bg-blue-700 text-white hover:text-white px-4 py-2 rounded text-sm font-medium shadow hover:bg-blue-600 transition mb-4"
+      >
+        ✏️ Edit Store
+      </router-link>
+    </div>
 
-    <!-- Add Item Button -->
-    <div class="flex justify-end mb-4">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-xl font-semibold text-gray-800">📦 Items</h2>
       <button
         @click="showForm = !showForm"
         class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition"
@@ -49,7 +50,7 @@
      <router-link
         v-for="item in items"
         :key="item.id"
-        :to="{ name: 'Item', params: { id: item.id }, query: { store_id: store.id } }"
+        :to="{ name: 'Item', params: { store_id: store.id, id: item.id } }"
         class="block bg-white rounded-lg shadow p-4 hover:shadow-md transition duration-200"
       >
         <h3 class="text-lg font-semibold text-gray-800 mb-1">{{ item.name }}</h3>
@@ -57,7 +58,13 @@
         <p class="text-sm text-gray-700">{{ item.description }}</p>
       </router-link>
     </div>
-    <p v-else class="text-gray-500">No items found for this </p>
+    <!-- No Items Message -->
+    <p
+      v-else
+      class="text-center text-gray-400 italic py-16"
+    >
+      No items found for this store.
+    </p>
   </div>
 
   <div v-else-if="loading">
@@ -89,11 +96,11 @@ onMounted(async () => {
   try {
     // Fetch store details
     const storeRes = await fetch(`http://localhost:3000/stores/${storeId}`);
-    if (!storeRes.ok) throw new Error('Failed to load store');
-    
     const data = await storeRes.json()
-    store.value = data.data
 
+    if (!storeRes.ok) throw new Error(data.errors);
+
+    store.value = data.data
 
     // Fetch store items
     const itemsRes = await fetch(`http://localhost:3000/stores/${storeId}/items`);
@@ -109,7 +116,7 @@ onMounted(async () => {
     const countData = await countRes.json();
     itemCount.value = countData.data;
   } catch (error) {
-    console.error(error);
+    showToast(error, 'error');
   } finally {
     loading.value = false;
   }

@@ -4,7 +4,7 @@
       <h1 class="text-2xl font-bold">Stores</h1>
       <router-link
         to="/stores/new"
-        class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm font-medium rounded shadow"
+        class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white hover:text-white px-4 py-2 text-sm font-medium rounded shadow"
       >
         <span class="text-lg">＋</span>
         <span>New Store</span>
@@ -144,12 +144,6 @@ const searchQuery = ref('');
 let searchTimeout = null;
 
 onMounted(() => {
-  if (route.query.success) {
-    // toastMessage.value = route.query.success;
-    // showToast.value = true;
-    router.replace({ query: {} }); // Clear query param
-  }
-
   fetchStores();
 });
 

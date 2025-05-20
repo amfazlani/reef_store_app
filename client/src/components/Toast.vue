@@ -2,7 +2,10 @@
   <transition name="fade">
     <div
       v-if="visible"
-      class="fixed top-20 right-4 bg-green-600 text-white px-6 py-3 rounded shadow-lg z-50"
+      :class="[
+        'fixed top-20 right-4 text-white px-6 py-3 rounded shadow-lg z-50',
+        type === 'error' ? 'bg-red-600' : 'bg-green-600'
+      ]"
     >
       {{ message }}
     </div>
@@ -14,9 +17,11 @@ import { ref } from 'vue';
 
 const visible = ref(false);
 const message = ref('');
+const type = ref('success'); // default to success
 
-function showToast(msg, duration = 3000) {
+function showToast(msg, toastType = 'success', duration = 3000) {
   message.value = msg;
+  type.value = toastType;
   visible.value = true;
 
   setTimeout(() => {
@@ -24,7 +29,7 @@ function showToast(msg, duration = 3000) {
   }, duration);
 }
 
-// 👇 Make this available to parent via ref
+// Expose the function for global use
 defineExpose({ showToast });
 </script>
 

@@ -39,7 +39,7 @@
       <div class="flex justify-end space-x-4">
         <router-link
           :to="mode === 'edit' ? `/stores/${route.params.id}` : '/'"
-          class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded"
+          class="bg-red-600 hover:bg-red-700 text-white hover:text-white font-medium py-2 px-4 rounded"
         >
           Cancel
         </router-link>
