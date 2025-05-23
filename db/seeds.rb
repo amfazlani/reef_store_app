@@ -10,7 +10,7 @@
 
 if Store.count.zero?
   5.times do |i|
-    @store = Store.create(name: Faker::Company.name, address: Faker::Address.full_address, place_id: "place_id_#{ id + 1 }")
+    @store = Store.create(name: Faker::Company.name, address: Faker::Address.full_address, place_id: "place_id_#{ i + 1 }")
 
     5.times do
       @item = @store.items.create(name: Faker::Lorem.word, price: Faker::Number.decimal(l_digits: 2))
