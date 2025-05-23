@@ -6,34 +6,32 @@ RSpec.describe 'Items', type: :request do
   let!(:items) { create_list(:item, 5, store: store) }
   let!(:item) { items.first }
 
-  # valid payload
-  let(:valid_create_params) {
+  let(:valid_params) do
     {
-      "item": {
-        "name": 'Item A',
-        "price": 19.99
+      item: {
+        name: 'Item A',
+        price: 19.99
       }
     }
-  }
+  end
 
-  let(:valid_update_params) {
+  let(:updated_params) do
     {
-      "item": {
-        "name": 'Updated Item',
-        "price": 19.99
+      item: {
+        name: 'Updated Item',
+        price: 19.99
       }
     }
-  }
+  end
 
-  # invalid payload
-  let(:invalid_params) {
+  let(:invalid_params) do
     {
-      "item": {
-        "name": '',
-        "price": 19.99
+      item: {
+        name: '',
+        price: 19.99
       }
     }
-  }
+  end
 
   describe '#index' do
     before do
@@ -41,12 +39,8 @@ RSpec.describe 'Items', type: :request do
     end
 
     it 'returns stores' do
-      expect(parsed_response["data"]).not_to be_empty
       expect(parsed_response["data"].size).to eq(5)
-    end
-
-    it 'returns status code 200' do
-      expect(response).to have_http_status(200)
+      expect_status(200)
     end
   end
 
@@ -57,50 +51,38 @@ RSpec.describe 'Items', type: :request do
         get item_path(item)
       end
 
-      it 'returns the store' do
-        expect(parsed_response["data"]).not_to be_nil
+      it 'returns the item' do
         expect(parsed_response["data"]["id"]).to eq(item.id)
-      end
-
-      it 'returns status code 200' do
-        expect(response).to have_http_status(200)
+        expect_status(200)
       end
     end
 
     context 'when the record does not exist' do
-      let!(:item_id) { 100 }
-
-      before { get item_path(item_id) }
+      before { get item_path(99999) }
 
       it 'returns status code 404' do
-        expect(response).to have_http_status(404)
+        expect_status(404)
       end
     end
   end
 
   describe '#create' do
     context 'when the request is valid' do
-      before { post store_items_path(store), params: valid_create_params }
+      before { post store_items_path(store), params: valid_params }
 
-      it 'creates a store' do
-        expect(parsed_response['data']['name']).to eq(valid_create_params[:item][:name])
+      it 'creates a item' do
+        expect(parsed_response['data']['name']).to eq(valid_params[:item][:name])
         expect(parsed_response['data']['price']).to eq('19.99')
-      end
-
-      it 'returns status code 200' do
-        expect(response).to have_http_status(200)
+        expect_status(200)
       end
     end
 
     context 'when the request is invalid' do
       before { post store_items_path(store), params: invalid_params }
 
-      it 'returns status code 422' do
-        expect(response).to have_http_status(422)
-      end
-
-      it 'returns a validation failure message' do
-        expect(parsed_response['errors']).to eq([ "Name can't be blank" ])
+      it 'returns validation error' do
+        expect_error_message("Name can't be blank")
+        expect_status(422)
       end
     end
   end
@@ -108,26 +90,20 @@ RSpec.describe 'Items', type: :request do
   # Test suite for PUT /branches/:id
   describe '#update' do
     context 'when the request is valid' do
-      before { put item_path(item), params: valid_update_params }
+      before { put item_path(item), params: updated_params }
 
       it 'updates the record' do
-        expect(parsed_response["data"]["name"]).to eq(valid_update_params[:item][:name])
-      end
-
-      it 'returns status code 200' do
-        expect(response).to have_http_status(200)
+        expect(parsed_response["data"]["name"]).to eq(updated_params[:item][:name])
+        expect_status(200)
       end
     end
 
     context 'when the request is invalid' do
       before { put item_path(item), params: invalid_params }
 
-      it 'returns status code 422' do
-        expect(response).to have_http_status(422)
-      end
-
-      it 'returns a validation failure message' do
-        expect(parsed_response['errors']).to eq([ "Name can't be blank" ])
+      it 'returns validation error' do
+        expect_error_message("Name can't be blank")
+        expect_status(422)
       end
     end
   end
@@ -138,7 +114,7 @@ RSpec.describe 'Items', type: :request do
     end
 
     it 'returns status code 200' do
-      expect(response).to have_http_status(200)
+      expect_status(200)
     end
   end
 end
