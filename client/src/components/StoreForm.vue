@@ -19,14 +19,15 @@
       <div>
         <label for="address" class="block font-medium mb-1">Address</label>
         <input
+          ref="autocompleteInput"
           v-model="address"
           type="text"
           id="address"
           class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Enter address"
           required
         />
       </div>
-
       <div>
         <label for="description" class="block font-medium mb-1">Description</label>
         <textarea
@@ -57,6 +58,7 @@
 <script setup>
 import { ref, onMounted, inject } from 'vue';
 import { useRoute, useRouter } from 'vue-router'
+import { Loader } from '@googlemaps/js-api-loader';
 
 const route = useRoute()
 const router = useRouter()
@@ -65,11 +67,31 @@ const showToast = inject('showToast');
 const name = ref('')
 const address = ref('')
 const description = ref('')
+const autocompleteInput = ref(null);
+const placeId = ref('');
 
 const mode = route.query.mode || 'create'
 const storeId = route.params.id
 
 onMounted(async () => {
+  const loader = new Loader({
+    apiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    version: 'weekly',
+    libraries: ['places']
+  });
+
+  await loader.load();
+
+  const autocomplete = new google.maps.places.Autocomplete(autocompleteInput.value, {
+    fields: ['formatted_address', 'place_id'],
+  });
+
+  autocomplete.addListener('place_changed', () => {
+    const place = autocomplete.getPlace();
+    address.value = place.formatted_address || '';
+    placeId.value = place.place_id || '';
+  });
+
   if (mode === 'edit' && storeId) {
     try {
       const res = await fetch(`http://localhost:3000/stores/${storeId}`)
@@ -100,7 +122,8 @@ const handleSubmit = async () => {
       body: JSON.stringify({
         name: name.value,
         address: address.value,
-        description: description.value
+        description: description.value,
+        place_id: placeId.value
       })
     })
     const redData = await res.json()
