@@ -3,15 +3,21 @@ class IngredientsController < ApplicationController
   before_action :find_ingredient, only: [ :show, :update, :destroy ]
 
   def index
-    @ingredients = @item.ingredients
+    cache_key = "items/#{@item.id}/ingredients"
 
-    render json: { data: @ingredients, status: 200 }
+    cached_ingredients = Rails.cache.fetch(cache_key, expires_in: 5.minutes) do
+      @item.ingredients
+    end
+
+    render json: { data: cached_ingredients, status: 200 }
   end
 
   def create
     @ingredient = Ingredient.new(ingredient_params.merge(item_id: @item.id))
 
     if @ingredient.save
+      clear_cache
+
       render json: { data: @ingredient, message: "Ingredient created successfully", status: 200 }
     else
       render json: { errors: @ingredient.errors.full_messages }, status: 422
@@ -20,6 +26,8 @@ class IngredientsController < ApplicationController
 
   def update
     if @ingredient.update(ingredient_params)
+      clear_cache
+
       render json: { data: @ingredient, message: "Ingredient updated successfully", status: 200 }
     else
       render json: { errors: @ingredient.errors.full_messages }, status: 422
@@ -28,6 +36,8 @@ class IngredientsController < ApplicationController
 
   def destroy
     if @ingredient.destroy
+      clear_cache
+
       render json: { data: @ingredient, message: "Ingredient deleted successfully", status: 200 }
     else
       render json: { errors: @ingredient.errors.full_messages }, status: 422

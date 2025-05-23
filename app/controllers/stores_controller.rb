@@ -2,29 +2,37 @@ class StoresController < ApplicationController
   before_action :find_store, only: [ :show, :update, :destroy ]
 
   def index
-    @stores = Store.all.ordered
+    cache_key = "stores/index/#{params[:page] || 1}-#{params[:limit] || 5}-#{params[:q]}"
 
-    if params[:q].present?
-      @stores = filter_stores
+    result = Rails.cache.fetch(cache_key, expires_in: 5.minutes) do
+      stores = Store.all.ordered
+
+      if params[:q].present?
+        stores = stores.where("name ILIKE ?", "%#{params[:q]}%")
+      end
+
+      paginated = stores.page(params[:page]).per(params[:limit] || 5)
+
+      {
+        data: paginated.as_json,
+        meta: {
+          total: paginated.total_count,
+          page: paginated.current_page,
+          limit: paginated.limit_value,
+          total_pages: paginated.total_pages
+        }
+      }
     end
 
-    @stores = @stores.page(params[:page]).per(params[:limit] || 5)
-
-    render json: {
-      data: @stores,
-      meta: {
-        total: @stores.total_count,
-        page: @stores.current_page,
-        limit: @stores.limit_value,
-        total_pages: @stores.total_pages
-      }
-    }
+    render json: result
   end
 
   def create
     @store = Store.new(store_params)
 
     if @store.save
+      clear_cache
+
       render json: { data: @store, message: "Store created successfully", status: 200 }
     else
       render json: { errors: @store.errors.full_messages }, status: 422
@@ -33,6 +41,8 @@ class StoresController < ApplicationController
 
   def update
     if @store.update(store_params)
+      clear_cache
+
       render json: { data: @store, message: "Store updated successfully", status: 200 }
     else
       render json: { errors: @store.errors.full_messages }, status: 422
@@ -41,6 +51,8 @@ class StoresController < ApplicationController
 
   def destroy
     if @store.destroy
+      clear_cache
+
       render json: { data: @store, message: "Store deleted successfully", status: 200 }
     else
       render json: { errors: @store.errors.full_messages }, status: 422
