@@ -1,7 +1,7 @@
 class IngredientsController < ApplicationController
   before_action :find_item, only: [ :index, :create ]
   before_action :find_ingredient, only: [ :show, :update, :destroy ]
-  after_action :clear_cache, only: [:create, :update, :destroy]
+  after_action :clear_cache, only: [ :create, :update, :destroy ]
 
   def index
     cache_key = "items/#{@item.id}/ingredients"

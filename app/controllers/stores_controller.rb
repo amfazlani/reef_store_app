@@ -1,6 +1,6 @@
 class StoresController < ApplicationController
   before_action :find_store, only: [ :show, :update, :destroy ]
-  after_action :clear_cache, only: [:create, :update, :destroy]
+  after_action :clear_cache, only: [ :create, :update, :destroy ]
 
   def index
     cache_key = "stores/index/#{params[:page] || 1}-#{params[:limit] || 5}-#{params[:q]}"
