@@ -75,6 +75,38 @@ git clone https://github.com/amfazlani/reef_store_app.git
 cd reef_store_app
 ```
 
+## Setup Environment Variables
+
+To enable Google Maps features, you need to create a `.env` file in your frontend project and add your Google Maps API key.
+
+Create a `.env` file in the root of your frontend project if it doesn't exist:
+
+   ```bash
+   touch .env
+  ```
+
+Open .env and add this line, replacing YOUR_GOOGLE_MAPS_API_KEY with your actual API key:
+
+```bash
+VITE_GOOGLE_MAPS_API_KEY=YOUR_GOOGLE_MAPS_API_KEY
+```
+
+#### How to Get Your Google Maps API Key:
+
+1. Visit the Google Cloud Console Credentials page.
+
+2. Create a new project or select an existing one.
+
+3. Click Create Credentials and select API key.
+
+4. Copy the generated API key.
+
+5. Paste it into your .env file as shown above.
+
+Ensure that the Google Maps JavaScript API (and other relevant APIs like Places API) are enabled for your project.
+
+Restart your development server after creating or updating .env.
+
 ## 2. Docker Setup
 
 Using **Docker** and **Docker Compose** simplifies the setup process by containerizing the application. Here’s how to run the app using Docker.
