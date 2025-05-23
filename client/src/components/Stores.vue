@@ -127,6 +127,7 @@
 <script setup>
 import { ref, onMounted, inject } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { throttle } from 'lodash';
 import Toast from '../components/Toast.vue';
 
 const route = useRoute();
@@ -144,7 +145,7 @@ const searchQuery = ref('');
 let searchTimeout = null;
 
 onMounted(() => {
-  fetchStores();
+  throttledFetchStores();
 });
 
 const fetchStores = async () => {
@@ -161,12 +162,12 @@ const fetchStores = async () => {
   }
 };
 
+// Throttle fetchStores using lodash
+const throttledFetchStores = throttle(fetchStores, 500);
+
 const handleSearch = () => {
-  clearTimeout(searchTimeout);
-  searchTimeout = setTimeout(() => {
-    page.value = 1; // Reset to first page on new search
-    fetchStores();
-  }, 300); // debounce API calls
+  page.value = 1;
+  throttledFetchStores();
 };
 
 const startEditing = (store) => {
