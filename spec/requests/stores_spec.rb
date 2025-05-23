@@ -85,7 +85,7 @@ RSpec.describe 'Stores', type: :request do
     end
 
     context 'place is already taken' do
-      let!(:store) { create(:store, place_id: place_id )}
+      let!(:store) { create(:store, place_id: place_id) }
 
       before { post stores_path, params: valid_params }
 
