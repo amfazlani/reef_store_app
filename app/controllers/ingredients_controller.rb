@@ -1,11 +1,16 @@
 class IngredientsController < ApplicationController
   before_action :find_item, only: [ :index, :create ]
   before_action :find_ingredient, only: [ :show, :update, :destroy ]
+  after_action :clear_cache, only: [ :create, :update, :destroy ]
 
   def index
-    @ingredients = @item.ingredients
+    cache_key = "items/#{@item.id}/ingredients"
 
-    render json: { data: @ingredients, status: 200 }
+    cached_ingredients = Rails.cache.fetch(cache_key, expires_in: 5.minutes) do
+      @item.ingredients
+    end
+
+    render json: { data: cached_ingredients, status: 200 }
   end
 
   def create
@@ -50,5 +55,9 @@ class IngredientsController < ApplicationController
 
   def find_item
     @item = Item.find(params[:item_id])
+  end
+
+  def clear_cache
+    Rails.cache.delete("items/#{@item.id}/ingredients") if @item
   end
 end

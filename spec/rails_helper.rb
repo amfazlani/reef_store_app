@@ -36,6 +36,31 @@ rescue ActiveRecord::PendingMigrationError => e
   abort e.to_s.strip
 end
 RSpec.configure do |config|
+  # Start by cleaning with truncation before the test suite runs
+  config.before(:suite) do
+    DatabaseCleaner.clean_with(:truncation)
+  end
+
+  # Use transaction strategy for fast tests
+  config.before(:each) do
+    DatabaseCleaner.strategy = :transaction
+  end
+
+  # For tests tagged with `js: true`, switch to truncation strategy
+  config.before(:each, js: true) do
+    DatabaseCleaner.strategy = :truncation
+  end
+
+  # Start cleaning before each example
+  config.before(:each) do
+    DatabaseCleaner.start
+  end
+
+  # Clean database after each example
+  config.after(:each) do
+    DatabaseCleaner.clean
+  end
+
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [
     Rails.root.join('spec/fixtures')
@@ -67,6 +92,7 @@ RSpec.configure do |config|
   # config.infer_spec_type_from_file_location!
   config.include FactoryBot::Syntax::Methods
   config.include Requests::JsonHelpers, type: :request
+  config.include Requests::ResponseHelpers, type: :request
   # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:

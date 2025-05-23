@@ -1,24 +1,31 @@
 class StoresController < ApplicationController
   before_action :find_store, only: [ :show, :update, :destroy ]
+  after_action :clear_cache, only: [ :create, :update, :destroy ]
 
   def index
-    @stores = Store.all.ordered
+    cache_key = "stores/index/#{params[:page] || 1}-#{params[:limit] || 5}-#{params[:q]}"
 
-    if params[:q].present?
-      @stores = filter_stores
+    result = Rails.cache.fetch(cache_key, expires_in: 5.minutes) do
+      stores = Store.all.ordered
+
+      if params[:q].present?
+        stores = stores.where("name ILIKE ?", "%#{params[:q]}%")
+      end
+
+      paginated = stores.page(params[:page]).per(params[:limit] || 5)
+
+      {
+        data: paginated.as_json,
+        meta: {
+          total: paginated.total_count,
+          page: paginated.current_page,
+          limit: paginated.limit_value,
+          total_pages: paginated.total_pages
+        }
+      }
     end
 
-    @stores = @stores.page(params[:page]).per(params[:limit] || 5)
-
-    render json: {
-      data: @stores,
-      meta: {
-        total: @stores.total_count,
-        page: @stores.current_page,
-        limit: @stores.limit_value,
-        total_pages: @stores.total_pages
-      }
-    }
+    render json: result
   end
 
   def create
@@ -54,7 +61,7 @@ class StoresController < ApplicationController
   private
 
   def store_params
-    params.require(:store).permit(:name, :address, :description)
+    params.require(:store).permit(:name, :address, :description, :place_id)
   end
 
 
@@ -64,5 +71,9 @@ class StoresController < ApplicationController
 
   def filter_stores
     @stores = @stores.where("name ILIKE ?", "%#{params[:q]}%")
+  end
+
+  def clear_cache
+    Rails.cache.delete_matched("stores/index/*")
   end
 end

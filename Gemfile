@@ -50,3 +50,7 @@ group :development, :test do
   gem "factory_bot_rails"
   gem "pry"
 end
+
+group :test do
+  gem "database_cleaner-active_record"
+end
