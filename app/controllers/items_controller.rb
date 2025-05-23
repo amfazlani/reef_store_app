@@ -1,6 +1,7 @@
 class ItemsController < ApplicationController
   before_action :find_store, only: [ :index, :create, :count ]
   before_action :find_item, only: [ :show, :update, :destroy ]
+  after_action :clear_cache, only: [:create, :update, :destroy]
 
   def index
     cache_key = "stores/#{@store.id}/items"
@@ -16,8 +17,6 @@ class ItemsController < ApplicationController
     @item = Item.new(item_params.merge(store_id: @store.id))
 
     if @item.save
-      clear_cache
-
       render json: { data: @item, message: "item created successfully", status: 200 }
     else
       render json: { errors: @item.errors.full_messages }, status: 422
@@ -26,8 +25,6 @@ class ItemsController < ApplicationController
 
   def update
     if @item.update(item_params)
-      clear_cache
-
       render json: { data: @item, message: "item updated successfully", status: 200 }
     else
       render json: { errors: @item.errors.full_messages }, status: 422
@@ -36,8 +33,6 @@ class ItemsController < ApplicationController
 
   def destroy
     if @item.destroy
-      clear_cache
-
       render json: { data: @item, message: "item deleted successfully", status: 200 }
     else
       render json: { errors: @item.errors.full_messages }, status: 422
@@ -66,5 +61,9 @@ class ItemsController < ApplicationController
 
   def find_store
     @store = Store.find(params[:store_id])
+  end
+
+  def clear_cache
+    Rails.cache.delete("stores/#{@store.id}/items") if @store
   end
 end

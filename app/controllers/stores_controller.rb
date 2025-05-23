@@ -1,5 +1,6 @@
 class StoresController < ApplicationController
   before_action :find_store, only: [ :show, :update, :destroy ]
+  after_action :clear_cache, only: [:create, :update, :destroy]
 
   def index
     cache_key = "stores/index/#{params[:page] || 1}-#{params[:limit] || 5}-#{params[:q]}"
@@ -31,8 +32,6 @@ class StoresController < ApplicationController
     @store = Store.new(store_params)
 
     if @store.save
-      clear_cache
-
       render json: { data: @store, message: "Store created successfully", status: 200 }
     else
       render json: { errors: @store.errors.full_messages }, status: 422
@@ -41,8 +40,6 @@ class StoresController < ApplicationController
 
   def update
     if @store.update(store_params)
-      clear_cache
-
       render json: { data: @store, message: "Store updated successfully", status: 200 }
     else
       render json: { errors: @store.errors.full_messages }, status: 422
@@ -51,8 +48,6 @@ class StoresController < ApplicationController
 
   def destroy
     if @store.destroy
-      clear_cache
-
       render json: { data: @store, message: "Store deleted successfully", status: 200 }
     else
       render json: { errors: @store.errors.full_messages }, status: 422
@@ -76,5 +71,9 @@ class StoresController < ApplicationController
 
   def filter_stores
     @stores = @stores.where("name ILIKE ?", "%#{params[:q]}%")
+  end
+
+  def clear_cache
+    Rails.cache.delete_matched("stores/index/*")
   end
 end
