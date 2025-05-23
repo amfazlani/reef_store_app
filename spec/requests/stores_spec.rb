@@ -4,14 +4,16 @@ RSpec.describe 'Stores', type: :request do
   # initialize test data
   let!(:stores) { create_list(:store, 5) }
   let!(:store) { stores.first }
+  let!(:place_id) { 'ChIJM7UJM-uNVoYRg-RTlgFosng' }
 
   # valid payload
   let(:valid_create_params) {
     {
       "store": {
         "name": 'Branch A',
-        "address": '11411 West Oak Blvd',
-        "description": "Description of the store"
+        "address": '3601 S Treadaway Blvd, Abilene, TX 79602, USA',
+        "description": "Description of the store",
+        "place_id": place_id
       }
     }
   }
@@ -32,7 +34,8 @@ RSpec.describe 'Stores', type: :request do
       "store": {
         "name": '',
         "address": '11411 West Oak Blvd',
-        "description": "Description of the store"
+        "description": "Description of the store",
+        "place_id": place_id
       }
     }
   }
@@ -106,6 +109,20 @@ RSpec.describe 'Stores', type: :request do
 
       it 'returns a validation failure message' do
         expect(parsed_response['errors']).to eq([ "Name can't be blank" ])
+      end
+    end
+
+    context 'place is already taken' do
+      let!(:store) { create(:store, place_id: place_id )}
+
+      before { post stores_path, params: valid_create_params }
+
+      it 'returns status code 422' do
+        expect(response).to have_http_status(422)
+      end
+
+      it 'returns a validation failure message' do
+        expect(parsed_response['errors']).to eq([ "Place has already been taken" ])
       end
     end
   end
